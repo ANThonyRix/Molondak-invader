@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Molondak Invader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+    <title>Molondak Invader - PC & Mobile</title>
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         body {
             margin: 0;
-            padding: 0;
+            padding: 2px;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a0f2e 25%, #2d1b69 50%, #1a0f2e 75%, #0a0a0a 100%);
             color: #fff;
             font-family: 'Courier New', monospace;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .game-container {
             text-align: center;
             background: linear-gradient(135deg, rgba(17, 17, 34, 0.9) 0%, rgba(34, 17, 68, 0.8) 50%, rgba(17, 17, 34, 0.9) 100%);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(138, 43, 226, 0.2);
+            padding: 2px;
+            border-radius: 3px;
             position: relative;
-            border: 2px solid rgba(0, 255, 255, 0.6);
+            border: none;
+            width: 100%;
+            max-width: 810px;
         }
 
         canvas {
@@ -33,27 +46,34 @@
             background: linear-gradient(180deg, #000011 0%, #001122 30%, #112244 60%, #000011 100%);
             display: block;
             margin: 0 auto;
-            box-shadow: inset 0 0 50px rgba(0, 100, 200, 0.3);
+            box-shadow: inset 0 0 15px rgba(0, 100, 200, 0.2), 0 0 10px rgba(0, 255, 255, 0.4);
+            width: 100%;
+            height: auto;
+            max-width: 800px;
+            max-height: 600px;
         }
 
         .game-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
-            font-size: 18px;
+            font-size: clamp(12px, 3vw, 18px);
             color: #00ffff;
             text-shadow: 0 0 10px #00ffff;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .controls {
             margin-top: 15px;
-            font-size: 14px;
+            font-size: clamp(10px, 2.5vw, 14px);
             color: #ccc;
+            line-height: 1.4;
         }
 
         #loadingText {
             color: #00ffff;
-            font-size: 18px;
+            font-size: clamp(14px, 4vw, 18px);
             margin: 20px 0;
             text-shadow: 0 0 10px #00ffff;
         }
@@ -64,19 +84,20 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         #musicToggle {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             border: 2px solid #00d4ff;
             border-radius: 8px;
-            width: 45px;
-            height: 45px;
+            width: clamp(35px, 8vw, 45px);
+            height: clamp(35px, 8vw, 45px);
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 20px);
             color: #00d4ff;
             box-shadow: 
                 0 0 15px rgba(0, 212, 255, 0.3),
@@ -85,9 +106,10 @@
             position: relative;
             font-family: 'Courier New', monospace;
             font-weight: bold;
+            touch-action: manipulation;
         }
 
-        #musicToggle:hover {
+        #musicToggle:hover, #musicToggle:active {
             transform: scale(1.05);
             box-shadow: 
                 0 0 25px rgba(0, 212, 255, 0.5),
@@ -105,7 +127,7 @@
                 inset 0 0 10px rgba(255, 68, 68, 0.1);
         }
 
-        #musicToggle.muted:hover {
+        #musicToggle.muted:hover, #musicToggle.muted:active {
             box-shadow: 
                 0 0 25px rgba(255, 68, 68, 0.5),
                 inset 0 0 15px rgba(255, 68, 68, 0.2);
@@ -113,7 +135,7 @@
 
         #volumeSlider {
             -webkit-appearance: none;
-            width: 120px;
+            width: clamp(80px, 20vw, 120px);
             height: 6px;
             background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             border: 1px solid #00d4ff;
@@ -157,13 +179,211 @@
                 0 0 8px rgba(0, 212, 255, 0.6),
                 inset 0 0 3px rgba(255, 255, 255, 0.3);
         }
+        
+        /* Improve volume slider for mobile */
+        @media (max-width: 768px) {
+            #volumeSlider {
+                height: 8px; /* Slightly taller for easier touch */
+            }
+            
+            #volumeSlider::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px; /* Larger thumb for easier touch */
+            }
+            
+            #volumeSlider::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+            }
+        }
 
         .volume-label {
             color: #00d4ff;
-            font-size: 12px;
+            font-size: clamp(10px, 2.5vw, 12px);
             font-family: 'Courier New', monospace;
             text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
             margin-left: 8px;
+        }
+
+        /* Mobile Controls */
+        .mobile-controls {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Mobile Restart Button (shown only during game over) */
+        .mobile-restart-btn {
+            display: none;
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            background: linear-gradient(135deg, #1a2e1a 0%, #263e26 50%, #106010 100%);
+            border: 3px solid #00ff66;
+            border-radius: 12px;
+            width: clamp(120px, 25vw, 160px);
+            height: clamp(50px, 12vw, 60px);
+            color: #00ff66;
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            touch-action: manipulation;
+            user-select: none;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 102, 0.4),
+                inset 0 0 15px rgba(0, 255, 102, 0.1);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+        }
+
+        .mobile-restart-btn:active {
+            transform: translateX(-50%) scale(0.95);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 102, 0.6),
+                inset 0 0 20px rgba(0, 255, 102, 0.2);
+            border-color: #44ffaa;
+            color: #44ffaa;
+        }
+
+        .mobile-btn {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: #00d4ff;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            user-select: none;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .mobile-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .mobile-controls-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .direction-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 769px) {
+            /* Desktop/PC specific styles */
+            .mobile-controls {
+                display: none !important;
+            }
+            
+            .mobile-restart-btn {
+                display: none !important;
+            }
+            
+            .controls {
+                display: block !important;
+            }
+            
+            .game-container {
+                max-width: 1200px;
+                padding: 20px;
+            }
+            
+            canvas {
+                max-width: 1120px;
+                max-height: 840px;
+            }
+            
+            .game-info {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .music-controls {
+                margin-top: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Mobile/Tablet specific styles */
+            body {
+                padding: 5px;
+            }
+            
+            .game-container {
+                padding: 8px;
+                width: 100%;
+                max-width: none;
+            }
+            
+            .mobile-controls {
+                display: flex;
+            }
+            
+            .controls {
+                display: none;
+            }
+            
+            .game-info {
+                font-size: 14px;
+                justify-content: space-around;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .mobile-controls {
+                bottom: 10px;
+                gap: 15px;
+            }
+            
+            .direction-controls {
+                gap: 8px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                padding: 2px;
+            }
+            
+            .game-container {
+                padding: 5px;
+            }
+            
+            .mobile-controls {
+                bottom: 5px;
+                gap: 10px;
+            }
+            
+            .mobile-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -173,15 +393,16 @@
         <div>Score: <span id="score">0</span></div>
         <div>Lives: <span id="lives">3</span></div>
         <div>Level: <span id="level">1</span></div>
-        <div id="formation-name" style="color: #00d4ff; font-size: 14px; text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);">CLASSIC GRID</div>
+        <div id="formation-name" style="color: #00d4ff; font-size: clamp(10px, 2.5vw, 14px); text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);">CLASSIC GRID</div>
     </div>
 
     <div id="loadingText">Loading player image...</div>
     <canvas id="gameCanvas" width="800" height="600" style="display: none;"></canvas>
 
     <div class="controls" id="gameControls" style="display: none;">
-        Use ← → Arrow Keys to Move | Hold SPACEBAR to Shoot | P to Pause | R to Restart (when game over)<br>
-        <span style="font-size: 12px; color: #888;">DEBUG: Press N to skip level and test formations</span>
+        <span id="pcControls">Use ← → Arrow Keys to Move | Hold SPACEBAR to Shoot | P to Pause | R to Restart (when game over)</span>
+        <span id="touchControls" style="display: none;">Touch screen to shoot | Use on-screen buttons to move | Touch pause button to pause</span><br>
+        <span style="font-size: clamp(8px, 2vw, 12px); color: #888;">DEBUG: Press N to skip level and test formations</span>
     </div>
     
     <div class="music-controls">
@@ -191,22 +412,417 @@
     </div>
 </div>
 
+<!-- Mobile Controls -->
+<div class="mobile-controls" id="mobileControls">
+    <div class="mobile-controls-container">
+        <div class="direction-controls">
+            <button class="mobile-btn" id="leftBtn">←</button>
+            <button class="mobile-btn" id="rightBtn">→</button>
+        </div>
+        <button class="mobile-btn" id="shootBtn">🚀</button>
+        <button class="mobile-btn" id="pauseBtn">⏸</button>
+    </div>
+</div>
+
+<!-- Mobile Restart Button (shown only during game over) -->
+<button class="mobile-restart-btn" id="mobileRestartBtn">RESTART</button>
+
 <script>
+    // ====== DEVICE DETECTION ======
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               window.innerWidth <= 768 || 
+               ('ontouchstart' in window);
+    }
+    
+    function isTouchDevice() {
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    // ====== RESPONSIVE CANVAS SETUP ======
+    function resizeCanvas() {
+        const canvas = document.getElementById('gameCanvas');
+        const container = document.querySelector('.game-container');
+        const isMobile = isMobileDevice();
+        
+        // Get container dimensions
+        let containerWidth, containerHeight;
+        
+        if (isMobile) {
+            containerWidth = container.clientWidth - 20; // Account for padding
+            containerHeight = window.innerHeight - 200; // Leave space for UI and mobile controls
+        } else {
+            // PC/Desktop: use more conservative sizing for better fit
+            containerWidth = Math.min(container.clientWidth - 40, 900);
+            containerHeight = Math.min(window.innerHeight - 250, 700);
+        }
+        
+        // Calculate aspect ratio
+        const aspectRatio = 800 / 600;
+        let canvasWidth, canvasHeight;
+        
+        if (containerWidth / containerHeight > aspectRatio) {
+            // Height is limiting factor
+            canvasHeight = Math.min(containerHeight, isMobile ? 500 : 600);
+            canvasWidth = canvasHeight * aspectRatio;
+        } else {
+            // Width is limiting factor
+            canvasWidth = Math.min(containerWidth, isMobile ? 667 : 800);
+            canvasHeight = canvasWidth / aspectRatio;
+        }
+        
+        // Set canvas display size
+        canvas.style.width = canvasWidth + 'px';
+        canvas.style.height = canvasHeight + 'px';
+        
+        // Update scale factor for touch/mouse coordinates
+        window.canvasScale = {
+            x: 800 / canvasWidth,
+            y: 600 / canvasHeight
+        };
+    }
+
+    // ====== MOBILE CONTROLS ======
+    let mobileControls = {
+        left: false,
+        right: false,
+        shoot: false
+    };
+
+    function setupMobileControls() {
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const shootBtn = document.getElementById('shootBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const restartBtn = document.getElementById('mobileRestartBtn');
+        const isMobile = isMobileDevice();
+        const isTouch = isTouchDevice();
+
+        // Show appropriate controls based on device
+        if (isMobile || isTouch) {
+            document.getElementById('mobileControls').style.display = 'flex';
+            document.getElementById('touchControls').style.display = 'inline';
+            document.getElementById('pcControls').style.display = 'none';
+        } else {
+            document.getElementById('mobileControls').style.display = 'none';
+            document.getElementById('touchControls').style.display = 'none';
+            document.getElementById('pcControls').style.display = 'inline';
+        }
+
+        // Left button
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mobileControls.left = true;
+        });
+        leftBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mobileControls.left = false;
+        });
+
+        // Right button
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mobileControls.right = true;
+        });
+        rightBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mobileControls.right = false;
+        });
+
+        // Shoot button
+        shootBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mobileControls.shoot = true;
+        });
+        shootBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mobileControls.shoot = false;
+        });
+
+        // Pause button
+        pauseBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            togglePause();
+        });
+
+        // Mobile Restart button
+        restartBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameState === 'gameOver') {
+                restartGame();
+            }
+        });
+        restartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (gameState === 'gameOver') {
+                restartGame();
+            }
+        });
+
+        // Also add mouse events for desktop users with touch screens or hybrid devices
+        if (isTouch || !isMobile) {
+            leftBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                mobileControls.left = true;
+            });
+            leftBtn.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                mobileControls.left = false;
+            });
+            leftBtn.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                mobileControls.left = false;
+            });
+            
+            rightBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                mobileControls.right = true;
+            });
+            rightBtn.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                mobileControls.right = false;
+            });
+            rightBtn.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                mobileControls.right = false;
+            });
+            
+            shootBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                mobileControls.shoot = true;
+            });
+            shootBtn.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                mobileControls.shoot = false;
+            });
+            shootBtn.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                mobileControls.shoot = false;
+            });
+            
+            pauseBtn.addEventListener('click', togglePause);
+        }
+    }
+
+    // ====== MOBILE RESTART BUTTON VISIBILITY ======
+    function updateMobileRestartButton() {
+        const restartBtn = document.getElementById('mobileRestartBtn');
+        const isMobile = isMobileDevice();
+        const isTouch = isTouchDevice();
+        
+        // Only show mobile restart button on mobile/touch devices during game over
+        if ((isMobile || isTouch) && gameState === 'gameOver') {
+            restartBtn.style.display = 'block';
+        } else {
+            restartBtn.style.display = 'none';
+        }
+    }
+
+    // ====== ADAPTIVE INTERFACE INITIALIZATION ======
+    function initializeAdaptiveInterface() {
+        setupMobileControls();
+        resizeCanvas();
+        updateMobileRestartButton();
+        
+        // Add resize listener
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            setupMobileControls(); // Re-setup controls on resize in case device orientation changed
+        });
+        
+        // Add orientation change listener for mobile devices
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                resizeCanvas();
+                setupMobileControls();
+            }, 100); // Small delay to ensure orientation change is complete
+        });
+        
+        // Add global click handler as ultimate fallback for START button
+        const canvas = document.getElementById('gameCanvas');
+        canvas.addEventListener('click', (e) => {
+            console.log('Global canvas click handler triggered');
+            if (gameState === 'menu') {
+                console.log('Starting game from global click handler');
+                startGame();
+            }
+        }, true); // Use capture phase to ensure it fires
+    }
+
+    // ====== TOUCH CONTROLS FOR CANVAS ======
+    function setupTouchControls() {
+        const canvas = document.getElementById('gameCanvas');
+        const isTouch = isTouchDevice();
+        
+        console.log('Setting up touch controls, isTouch:', isTouch);
+        
+        // Set up controls for all devices (touch and non-touch)
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            if (gameState === 'menu') {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                // Calculate coordinates relative to the actual canvas size (800x600)
+                const x = (touch.clientX - rect.left) * (800 / rect.width);
+                const y = (touch.clientY - rect.top) * (600 / rect.height);
+
+                const buttonX = 800 / 2 - 100;  // 300
+                const buttonY = 600 / 2 + 50;   // 350
+                const buttonWidth = 200;
+                const buttonHeight = 60;
+
+                console.log(`Touch at: ${x}, ${y}, Button: ${buttonX}-${buttonX + buttonWidth}, ${buttonY}-${buttonY + buttonHeight}`);
+
+                if (x >= buttonX && x <= buttonX + buttonWidth &&
+                    y >= buttonY && y <= buttonY + buttonHeight) {
+                    console.log('START button touched!');
+                    startGame();
+                } else {
+                    // Fallback: anywhere on screen starts game (backwards compatibility)
+                    startGame();
+                }
+            } else if (gameState === 'levelComplete') {
+                continueToNextLevel();
+            } else if (gameState === 'playing') {
+                // Touch to shoot
+                mobileControls.shoot = true;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mobileControls.shoot = false;
+        });
+        
+        // Handle touch movement for player control
+        let touchStartX = null;
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (gameState !== 'playing') return;
+            
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchX = (touch.clientX - rect.left) * window.canvasScale.x;
+            
+            if (touchStartX === null) {
+                touchStartX = touchX;
+            }
+            
+            const deltaX = touchX - touchStartX;
+            
+            if (Math.abs(deltaX) > 10) {
+                mobileControls.left = deltaX < 0;
+                mobileControls.right = deltaX > 0;
+            } else {
+                mobileControls.left = false;
+                mobileControls.right = false;
+            }
+        });
+        
+        canvas.addEventListener('touchend', () => {
+            touchStartX = null;
+            mobileControls.left = false;
+            mobileControls.right = false;
+        });
+        
+        // Also add click support for PC users
+        canvas.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (gameState === 'menu') {
+                const rect = canvas.getBoundingClientRect();
+                // Calculate coordinates relative to the actual canvas size (800x600)
+                // Use the same scaling as touch events
+                const x = (e.clientX - rect.left) * (800 / rect.width);
+                const y = (e.clientY - rect.top) * (600 / rect.height);
+
+                const buttonX = 800 / 2 - 100;  // 300
+                const buttonY = 600 / 2 + 50;   // 350
+                const buttonWidth = 200;
+                const buttonHeight = 60;
+
+                console.log(`Click at: ${x.toFixed(2)}, ${y.toFixed(2)}, Button: ${buttonX}-${buttonX + buttonWidth}, ${buttonY}-${buttonY + buttonHeight}`);
+
+                if (x >= buttonX && x <= buttonX + buttonWidth &&
+                    y >= buttonY && y <= buttonY + buttonHeight) {
+                    console.log('START button clicked!');
+                    startGame();
+                } else {
+                    // Fallback: if click is anywhere in menu area, start game for better UX
+                    console.log('Click outside button area, but starting game anyway for better UX');
+                    startGame();
+                }
+            } else if (gameState === 'levelComplete') {
+                continueToNextLevel();
+            }
+        });
+        
+        // Add mousedown event as backup for better reliability
+        canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (gameState === 'menu') {
+                console.log('Mouse down detected on menu, starting game');
+                startGame();
+            } else if (gameState === 'levelComplete') {
+                continueToNextLevel();
+            }
+        });
+    }
+
     // ====== MUSIC SETUP ======
     const music = new Audio('https://raw.githubusercontent.com/ANThonyRix/audio_space_invaders/main/Star_wars.mp3');
     music.loop = true;
-    let musicPlaying = false;
     music.volume = 0.5;
+    music.preload = 'auto';
+    
+    let musicPlaying = false;
+    let musicEnabled = false; // Track if user has enabled music
+    let audioContext = null;
+    let musicInitialized = false;
+
+    // Initialize Web Audio API for better mobile support
+    function initializeAudio() {
+        if (musicInitialized) return;
+        
+        try {
+            // Create AudioContext for better mobile compatibility
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioContext && window.AudioContext) {
+                audioContext = new AudioContext();
+                console.log('AudioContext created for mobile compatibility');
+            }
+            
+            // Resume AudioContext if suspended (common on mobile)
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log('AudioContext resumed');
+                });
+            }
+            
+            musicInitialized = true;
+            console.log('Audio system initialized for mobile compatibility');
+        } catch (e) {
+            console.log('Web Audio API not supported, using HTML5 audio fallback');
+            musicInitialized = true;
+        }
+    }
 
     // Set up music toggle button with Star Wars-inspired icons
     const musicToggle = document.getElementById('musicToggle');
     
     // Update button text based on state
     function updateMusicButton() {
-        if (musicPlaying) {
+        if (musicEnabled && musicPlaying) {
             musicToggle.innerHTML = '♫'; // Playing icon - musical note
             musicToggle.classList.remove('muted');
             musicToggle.title = 'DISABLE AUDIO SYSTEM';
+        } else if (musicEnabled && !musicPlaying) {
+            musicToggle.innerHTML = '⏸'; // Paused icon
+            musicToggle.classList.remove('muted');
+            musicToggle.title = 'MUSIC PAUSED - CLICK TO RESUME';
         } else {
             musicToggle.innerHTML = '✕'; // Muted/disabled icon - X mark
             musicToggle.classList.add('muted');
@@ -214,41 +830,265 @@
         }
     }
     
+    // Attempt to play music with proper error handling
+    function playMusic() {
+        if (!musicEnabled) return;
+        
+        initializeAudio();
+        
+        // Resume AudioContext if suspended
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume().then(() => {
+                actuallyPlayMusic();
+            }).catch(e => {
+                console.log('Failed to resume AudioContext:', e);
+                actuallyPlayMusic();
+            });
+        } else {
+            actuallyPlayMusic();
+        }
+    }
+    
+    function actuallyPlayMusic() {
+        // Enhanced mobile music playback
+        const isMobile = isMobileDevice() || isTouchDevice();
+        
+        // Ensure audio is unlocked on mobile
+        if (isMobile && !mobileAudioUnlocked) {
+            console.log('Mobile audio not unlocked yet, attempting unlock');
+            unlockMobileAudio();
+            // Retry after a short delay
+            setTimeout(() => {
+                actuallyPlayMusic();
+            }, 100);
+            return;
+        }
+        
+        // Set current time to 0 to restart from beginning if needed
+        if (music.paused && music.currentTime > 0) {
+            music.currentTime = 0;
+        }
+        
+        // Add mobile-specific audio setup
+        if (isMobile) {
+            music.load(); // Reload audio for mobile
+        }
+        
+        music.play().then(() => {
+            musicPlaying = true;
+            updateMusicButton();
+            console.log('Music started successfully on', isMobile ? 'mobile' : 'desktop');
+        }).catch(e => {
+            console.log('Music play failed:', e.message);
+            
+            // Enhanced mobile error handling
+            if (isMobile) {
+                console.log('Mobile audio error - trying alternative approach');
+                
+                // Try with volume adjustment for mobile
+                music.volume = 0.1;
+                setTimeout(() => {
+                    music.play().then(() => {
+                        music.volume = volumeSlider.value;
+                        musicPlaying = true;
+                        updateMusicButton();
+                        console.log('Music started with mobile workaround');
+                    }).catch(() => {
+                        console.log('Mobile audio completely blocked');
+                        musicPlaying = false;
+                        updateMusicButton();
+                    });
+                }, 50);
+            } else {
+                musicPlaying = false;
+                updateMusicButton();
+            }
+        });
+    }
+    
+    function pauseMusic() {
+        music.pause();
+        musicPlaying = false;
+        updateMusicButton();
+    }
+    
     updateMusicButton(); // Initialize button state
     
-    musicToggle.addEventListener('click', () => {
-        if (musicPlaying) {
-            music.pause();
-            musicPlaying = false;
-        } else {
-            music.play().catch(e => {
-                console.log('Music play failed, waiting for user interaction');
-            });
-            musicPlaying = true;
+    // Handle music toggle with enhanced mobile support
+    function handleMusicToggle(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Music toggle clicked/touched');
+        
+        initializeAudio();
+        
+        // Mobile-specific audio unlock
+        const isMobile = isMobileDevice() || isTouchDevice();
+        if (isMobile && !mobileAudioUnlocked) {
+            unlockMobileAudio();
         }
-        updateMusicButton();
+        
+        if (!musicEnabled) {
+            // First time enabling music
+            musicEnabled = true;
+            console.log('Music enabled by user interaction');
+            playMusic();
+        } else if (musicPlaying) {
+            pauseMusic();
+        } else {
+            playMusic();
+        }
+    }
+    
+    // Enhanced mobile event handling
+    let touchStartTime = 0;
+    
+    musicToggle.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        touchStartTime = Date.now();
+        console.log('Music button touch started');
+    });
+    
+    musicToggle.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const touchDuration = Date.now() - touchStartTime;
+        
+        // Only trigger if it was a quick tap (not a long press)
+        if (touchDuration < 500) {
+            console.log('Valid music button tap detected');
+            handleMusicToggle(e);
+        }
+    });
+    
+    // Keep click event for desktop/hybrid devices
+    musicToggle.addEventListener('click', (e) => {
+        // Prevent double-firing on devices that support both touch and click
+        if (e.detail === 0 || !isTouchDevice()) {
+            handleMusicToggle(e);
+        }
     });
 
     const volumeSlider = document.getElementById('volumeSlider');
     volumeSlider.addEventListener('input', () => {
         music.volume = volumeSlider.value;
     });
+    
+    // Handle volume changes on touch devices
+    volumeSlider.addEventListener('touchmove', () => {
+        music.volume = volumeSlider.value;
+    });
 
-    const startMusicOnInteraction = () => {
-        if (!musicPlaying) {
+    // Enhanced mobile music support
+    let firstInteractionHandled = false;
+    let mobileAudioUnlocked = false;
+    
+    const unlockMobileAudio = () => {
+        if (mobileAudioUnlocked) return;
+        
+        console.log('Attempting to unlock mobile audio');
+        
+        // Create a silent audio context interaction to unlock mobile audio
+        const silentAudio = new Audio();
+        silentAudio.volume = 0;
+        silentAudio.play().then(() => {
+            console.log('Mobile audio unlocked successfully');
+            mobileAudioUnlocked = true;
+            silentAudio.pause();
+            silentAudio.remove();
+        }).catch(() => {
+            console.log('Mobile audio unlock attempt failed');
+        });
+        
+        // Also try with main music
+        if (music.paused) {
             music.play().then(() => {
-                musicPlaying = true;
-                updateMusicButton();
-            }).catch(e => {
-                console.log('Music autoplay blocked');
+                music.pause();
+                music.currentTime = 0;
+                console.log('Main music unlocked for mobile');
+                mobileAudioUnlocked = true;
+            }).catch(() => {
+                console.log('Main music unlock failed');
             });
         }
-        document.removeEventListener('keydown', startMusicOnInteraction);
-        document.removeEventListener('click', startMusicOnInteraction);
     };
     
-    document.addEventListener('keydown', startMusicOnInteraction);
-    document.addEventListener('click', startMusicOnInteraction);
+    const handleFirstInteraction = (e) => {
+        if (firstInteractionHandled) return;
+        
+        console.log('First user interaction detected, initializing audio system');
+        initializeAudio();
+        unlockMobileAudio();
+        
+        firstInteractionHandled = true;
+        
+        // Remove listeners after first interaction
+        document.removeEventListener('keydown', handleFirstInteraction);
+        document.removeEventListener('click', handleFirstInteraction);
+        document.removeEventListener('touchstart', handleFirstInteraction);
+        document.removeEventListener('touchend', handleFirstInteraction);
+    };
+    
+    // Listen for various user interactions to initialize audio system
+    document.addEventListener('keydown', handleFirstInteraction);
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+    document.addEventListener('touchend', handleFirstInteraction);
+    
+    // Handle audio interruptions (common on mobile)
+    music.addEventListener('pause', () => {
+        if (musicEnabled && musicPlaying) {
+            // Audio was paused externally (e.g., phone call, notification)
+            musicPlaying = false;
+            updateMusicButton();
+            console.log('Music paused externally');
+        }
+    });
+    
+    music.addEventListener('ended', () => {
+        // Should not happen with loop=true, but handle just in case
+        if (musicEnabled) {
+            console.log('Music ended, restarting');
+            playMusic(); // Restart
+        }
+    });
+    
+    // Handle loading and error events
+    music.addEventListener('canplaythrough', () => {
+        console.log('Music loaded and ready to play');
+    });
+    
+    music.addEventListener('error', (e) => {
+        console.error('Music loading error:', e);
+        musicPlaying = false;
+        updateMusicButton();
+    });
+    
+    // Handle visibility changes (mobile app switching)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            // Page is hidden, pause music to be nice to user and save battery
+            if (musicPlaying) {
+                pauseMusic();
+                console.log('Music paused - app backgrounded');
+            }
+        } else {
+            // Page is visible again, resume if enabled
+            if (musicEnabled && !musicPlaying && music.paused) {
+                setTimeout(() => {
+                    playMusic();
+                    console.log('Music resumed - app foregrounded');
+                }, 100);
+            }
+        }
+    });
+    
+    // Handle page unload
+    window.addEventListener('beforeunload', () => {
+        if (musicPlaying) {
+            pauseMusic();
+        }
+    });
 
     // ====== BASIC VARIABLES ======
     const canvas = document.getElementById('gameCanvas');
@@ -277,9 +1117,9 @@
     
     let enemyImagesLoaded = 0;
     const enemyImageUrls = [
+        'https://i.postimg.cc/x8t9sH06/chog.png',
         'https://i.postimg.cc/85B1tgYH/mouch-big.png',
         'https://i.postimg.cc/SsQ5b0sV/mosferatu.png',
-        'https://i.postimg.cc/c4ZNXz79/salmonad.png',
         'https://i.postimg.cc/QMv25Yxq/mokadel.png',
         'https://i.postimg.cc/q7rnR42c/banana-chog.png'
     ];
@@ -326,7 +1166,7 @@
     function initializeSpace() {
         // Create twinkling stars
         stars = [];
-        for (let i = 0; i < 150; i++) {
+        for (let i = 0; i < 150; i++) { // Adjusted back to 150 for 800x600 canvas
             stars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -339,7 +1179,7 @@
 
         // Create floating nebula clouds
         nebulaClouds = [];
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 8; i++) { // Adjusted back to 8 for 800x600 canvas
             nebulaClouds.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -449,6 +1289,7 @@
     // ====== INPUT HANDLERS ======
     document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
+        console.log('Key pressed:', e.code, 'Game state:', gameState);
 
         if (e.code === 'Space') {
             e.preventDefault();
@@ -456,6 +1297,7 @@
             if (!spacePressed) {
                 spacePressed = true;
                 if (gameState === 'menu') {
+                    console.log('Starting game via SPACE key');
                     startGame();
                 } else if (gameState === 'levelComplete') {
                     continueToNextLevel();
@@ -464,7 +1306,9 @@
         }
 
         if (e.code === 'Enter') {
+            e.preventDefault();
             if (gameState === 'menu') {
+                console.log('Starting game via ENTER key');
                 startGame();
             } else if (gameState === 'levelComplete') {
                 continueToNextLevel();
@@ -493,31 +1337,25 @@
         }
     });
 
-    canvas.addEventListener('click', (e) => {
-        if (gameState === 'menu') {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const buttonX = canvas.width / 2 - 100;
-            const buttonY = canvas.height / 2 + 50;
-            const buttonWidth = 200;
-            const buttonHeight = 60;
-
-            if (x >= buttonX && x <= buttonX + buttonWidth &&
-                y >= buttonY && y <= buttonY + buttonHeight) {
-                startGame();
-            }
-        } else if (gameState === 'levelComplete') {
-            continueToNextLevel();
-        }
-    });
-
     // ====== GAME FUNCTIONS ======
     function startGame() {
+        console.log('startGame() called - initializing game');
         gameState = 'playing';
         document.getElementById('gameInfo').style.display = 'flex';
         document.getElementById('gameControls').style.display = 'block';
+        
+        // Show appropriate controls based on device type
+        setupMobileControls();
+
+        // Auto-start music when game begins
+        if (!musicEnabled) {
+            musicEnabled = true;
+            console.log('Auto-enabling music on game start');
+        }
+        if (!musicPlaying) {
+            playMusic();
+            console.log('Auto-starting music on game start');
+        }
 
         score = 0;
         lives = 3;
@@ -532,7 +1370,12 @@
 
         createInvaders();
         updateUI();
+        updateMobileRestartButton(); // Hide restart button when starting game
+        console.log('Game started successfully');
     }
+    
+    // Make startGame globally accessible for debugging
+    window.startGame = startGame;
 
     function continueToNextLevel() {
         gameState = 'playing';
@@ -545,14 +1388,30 @@
 
         createInvaders();
         updateUI();
+        updateMobileRestartButton(); // Hide restart button when continuing
     }
 
     function togglePause() {
         if (gameState === 'playing') {
             gameState = 'paused';
+            console.log('Game paused');
+            
+            // Pause music when game is paused
+            if (musicPlaying) {
+                pauseMusic();
+                console.log('Music paused with game');
+            }
         } else if (gameState === 'paused') {
             gameState = 'playing';
+            console.log('Game resumed');
+            
+            // Resume music when game is resumed (if it was enabled)
+            if (musicEnabled && !musicPlaying) {
+                playMusic();
+                console.log('Music resumed with game');
+            }
         }
+        updateMobileRestartButton(); // Update button visibility based on state
     }
 
     function restartGame() {
@@ -573,6 +1432,7 @@
         document.getElementById('gameInfo').style.display = 'none';
         document.getElementById('gameControls').style.display = 'none';
         updateUI();
+        updateMobileRestartButton(); // Hide restart button when restarting
     }
 
     function createInvaders() {
@@ -643,19 +1503,22 @@
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                // Original Space Invaders enemy distribution:
-                // Row 0: High-value enemies (30 points)
-                // Row 1: High-value enemies (30 points) 
-                // Row 2: Medium-value enemies (20 points)
-                // Row 3: Medium-value enemies (20 points)
-                // Row 4: Low-value enemies (10 points)
-                let enemyType, points, color;
-                if (row < 1) {
-                    enemyType = 0; points = 30; color = '#ff0000'; // Top row - highest value
-                } else if (row < 3) {
-                    enemyType = 1; points = 20; color = '#ffff00'; // Middle rows - medium value
-                } else {
-                    enemyType = 2; points = 10; color = '#00ffff'; // Bottom rows - lowest value
+                // Each row gets a unique enemy type (0-4 for rows 0-4)
+                // Row 0: Ultra-high value enemies (40 points) - chog.png
+                // Row 1: High-value enemies (30 points) - mouch-big.png
+                // Row 2: Medium-value enemies (20 points) - mosferatu.png
+                // Row 3: Low-medium value enemies (15 points) - mokadel.png
+                // Row 4: Low-value enemies (10 points) - banana-chog.png
+                const enemyType = row; // Direct mapping: row 0 = type 0, row 1 = type 1, etc.
+                let points, color;
+                
+                switch(enemyType) {
+                    case 0: points = 40; color = '#ff00ff'; break; // Purple for chog
+                    case 1: points = 30; color = '#ff0000'; break; // Red for mouch-big
+                    case 2: points = 20; color = '#ffff00'; break; // Yellow for mosferatu
+                    case 3: points = 15; color = '#88ff88'; break; // Green for mokadel
+                    case 4: points = 10; color = '#00ffff'; break; // Cyan for banana-chog
+                    default: points = 10; color = '#ffffff'; break;
                 }
                 
                 invaders.push({
@@ -672,21 +1535,18 @@
         }
     }
     
-
-
-
     function createCircleFormation(width, height, spacing) {
         // Circular formation
         const centerX = canvas.width / 2;
-        const centerY = 180;
-        const radius = 120;
-        const numEnemies = 24;
+        const centerY = 220; // Moved down slightly for larger canvas
+        const radius = 170; // Increased from 120 to 170 for larger canvas
+        const numEnemies = 32; // Increased from 24 to 32 for more enemies
         
         for (let i = 0; i < numEnemies; i++) {
             const angle = (i / numEnemies) * Math.PI * 2;
             const x = centerX + Math.cos(angle) * radius;
             const y = centerY + Math.sin(angle) * (radius * 0.6);
-            const enemyType = Math.floor(i / 8); // Group by 8s
+            const enemyType = i % 5; // Cycle through 5 enemy types
             
             invaders.push({
                 x: x - width / 2,
@@ -694,9 +1554,9 @@
                 width: width,
                 height: height,
                 row: enemyType,
-                type: enemyType < 1 ? 'small' : enemyType < 2 ? 'medium' : 'large',
-                points: enemyType < 1 ? 30 : enemyType < 2 ? 20 : 10,
-                color: enemyType < 1 ? '#ff0000' : enemyType < 2 ? '#ffff00' : '#00ffff'
+                type: enemyType < 2 ? 'small' : enemyType < 4 ? 'medium' : 'large',
+                points: enemyType < 1 ? 40 : enemyType < 2 ? 30 : enemyType < 3 ? 20 : enemyType < 4 ? 15 : 10,
+                color: enemyType < 1 ? '#ff00ff' : enemyType < 2 ? '#ff0000' : enemyType < 3 ? '#ffff00' : enemyType < 4 ? '#88ff88' : '#00ffff'
             });
         }
     }
@@ -709,32 +1569,32 @@
         
         // Horizontal arm
         for (let i = -armLength; i <= armLength; i++) {
-            const enemyType = Math.abs(i) < 2 ? 0 : Math.abs(i) < 4 ? 1 : 2;
+            const enemyType = Math.min(Math.abs(i), 4); // Use 5 types (0-4)
             invaders.push({
                 x: centerX + i * spacing,
                 y: centerY,
                 width: width,
                 height: height,
                 row: enemyType,
-                type: enemyType < 1 ? 'small' : enemyType < 2 ? 'medium' : 'large',
-                points: enemyType < 1 ? 30 : enemyType < 2 ? 20 : 10,
-                color: enemyType < 1 ? '#ff0000' : enemyType < 2 ? '#ffff00' : '#00ffff'
+                type: enemyType < 2 ? 'small' : enemyType < 4 ? 'medium' : 'large',
+                points: enemyType < 1 ? 40 : enemyType < 2 ? 30 : enemyType < 3 ? 20 : enemyType < 4 ? 15 : 10,
+                color: enemyType < 1 ? '#ff00ff' : enemyType < 2 ? '#ff0000' : enemyType < 3 ? '#ffff00' : enemyType < 4 ? '#88ff88' : '#00ffff'
             });
         }
         
         // Vertical arm (excluding center which is already placed)
         for (let i = -armLength; i <= armLength; i++) {
             if (i !== 0) { // Skip center
-                const enemyType = Math.abs(i) < 2 ? 0 : Math.abs(i) < 4 ? 1 : 2;
+                const enemyType = Math.min(Math.abs(i), 4); // Use 5 types (0-4)
                 invaders.push({
                     x: centerX,
                     y: centerY + i * spacing,
                     width: width,
                     height: height,
                     row: enemyType,
-                    type: enemyType < 1 ? 'small' : enemyType < 2 ? 'medium' : 'large',
-                    points: enemyType < 1 ? 30 : enemyType < 2 ? 20 : 10,
-                    color: enemyType < 1 ? '#ff0000' : enemyType < 2 ? '#ffff00' : '#00ffff'
+                    type: enemyType < 2 ? 'small' : enemyType < 4 ? 'medium' : 'large',
+                    points: enemyType < 1 ? 40 : enemyType < 2 ? 30 : enemyType < 3 ? 20 : enemyType < 4 ? 15 : 10,
+                    color: enemyType < 1 ? '#ff00ff' : enemyType < 2 ? '#ff0000' : enemyType < 3 ? '#ffff00' : enemyType < 4 ? '#88ff88' : '#00ffff'
                 });
             }
         }
@@ -743,14 +1603,14 @@
     function createZigzagFormation(width, height, spacing) {
         // Zigzag pattern formation
         const rows = 6;
-        const baseX = 100;
+        const baseX = 140; // Increased from 100 to better center on wider canvas
         
         for (let row = 0; row < rows; row++) {
-            const numInRow = 8;
+            const numInRow = 11; // Increased from 8 to 11 for more enemies across width
             const zigzagOffset = (row % 2) * (spacing / 2); // Alternate offset
             
             for (let col = 0; col < numInRow; col++) {
-                const enemyType = Math.floor(row / 2);
+                const enemyType = Math.min(Math.floor(row * 5 / 6), 4); // Distribute 5 types across 6 rows
                 invaders.push({
                     x: baseX + col * spacing + zigzagOffset,
                     y: 60 + row * spacing,
@@ -758,8 +1618,8 @@
                     height: height,
                     row: enemyType,
                     type: enemyType < 2 ? 'small' : enemyType < 4 ? 'medium' : 'large',
-                    points: enemyType < 2 ? 30 : enemyType < 4 ? 20 : 10,
-                    color: enemyType < 2 ? '#ff0000' : enemyType < 4 ? '#ffff00' : '#00ffff'
+                    points: enemyType < 1 ? 40 : enemyType < 2 ? 30 : enemyType < 3 ? 20 : enemyType < 4 ? 15 : 10,
+                    color: enemyType < 1 ? '#ff00ff' : enemyType < 2 ? '#ff0000' : enemyType < 3 ? '#ffff00' : enemyType < 4 ? '#88ff88' : '#00ffff'
                 });
             }
         }
@@ -768,7 +1628,7 @@
     function createDensePackFormation(width, height, spacing) {
         // Dense packed formation with strategic gaps and clusters
         const rows = 8;
-        const cols = 13;
+        const cols = 18; // Increased from 13 to 18 for wider canvas
         const tightSpacing = spacing * 0.7;
         const startX = (canvas.width - (cols * tightSpacing)) / 2;
         const startY = 30;
@@ -782,14 +1642,14 @@
                 if (row === 5 && col % 4 === 2) continue; // Create gaps in row 5
                 
                 // Create dense clusters in the center
-                const isCenterCluster = (row >= 3 && row <= 4) && (col >= 5 && col <= 7);
+                const isCenterCluster = (row >= 3 && row <= 4) && (col >= 7 && col <= 10); // Adjusted for 18 columns
                 const enemySize = isCenterCluster ? 0.95 : 0.85; // Slightly larger in center
                 
-                const enemyType = Math.floor(row / 2.5);
-                const actualEnemyType = Math.min(enemyType, 4);
+                const enemyType = Math.floor(row * 5 / 8); // Distribute 5 types across 8 rows
+                const actualEnemyType = Math.min(enemyType, 4); // Use exactly 5 enemy types (0-4)
                 
                 // Higher point values for center cluster
-                let points = actualEnemyType < 2 ? 30 : actualEnemyType < 4 ? 20 : 10;
+                let points = actualEnemyType < 1 ? 40 : actualEnemyType < 2 ? 30 : actualEnemyType < 3 ? 20 : actualEnemyType < 4 ? 15 : 10;
                 if (isCenterCluster) points += 10; // Bonus points for center enemies
                 
                 invaders.push({
@@ -797,17 +1657,20 @@
                     y: startY + row * tightSpacing,
                     width: width * enemySize,
                     height: height * enemySize,
-                    row: Math.min(actualEnemyType, 4),
+                    row: actualEnemyType,
                     type: actualEnemyType < 2 ? 'small' : actualEnemyType < 4 ? 'medium' : 'large',
                     points: points,
-                    color: actualEnemyType < 2 ? '#ff0000' : actualEnemyType < 4 ? '#ffff00' : '#00ffff'
+                    color: actualEnemyType < 1 ? '#ff00ff' : actualEnemyType < 2 ? '#ff0000' : actualEnemyType < 3 ? '#ffff00' : actualEnemyType < 4 ? '#88ff88' : '#00ffff'
                 });
             }
         }
     }
 
     function handleShooting() {
-        if (keys['Space'] && gameState === 'playing') {
+        // Handle both keyboard and mobile controls
+        const shouldShoot = keys['Space'] || mobileControls.shoot;
+        
+        if (shouldShoot && gameState === 'playing') {
             const now = Date.now();
             if (now - lastShot > shootCooldown) {
                 bullets.push({
@@ -965,15 +1828,20 @@
         }
 
         updateParticles();
+        updateMobileRestartButton(); // Update restart button visibility based on game state
 
         if (gameState !== 'playing') return;
 
         handleShooting();
 
-        if (keys['ArrowLeft'] && player.x > 0) {
+        // Handle both keyboard and mobile controls for movement
+        const moveLeft = keys['ArrowLeft'] || mobileControls.left;
+        const moveRight = keys['ArrowRight'] || mobileControls.right;
+
+        if (moveLeft && player.x > 0) {
             player.x -= player.speed;
         }
-        if (keys['ArrowRight'] && player.x < canvas.width - player.width) {
+        if (moveRight && player.x < canvas.width - player.width) {
             player.x += player.speed;
         }
 
@@ -1089,7 +1957,7 @@
 
             ctx.fillStyle = '#cccccc';
             ctx.font = '18px Courier New';
-            ctx.fillText('Click START or press SPACE/ENTER to begin', canvas.width / 2, canvas.height - 80);
+            ctx.fillText('Tap START or touch screen to begin', canvas.width / 2, canvas.height - 80);
 
             if (imageLoaded && playerImage.complete) {
                 ctx.drawImage(playerImage, canvas.width / 2 - 25, canvas.height / 2 - 200, 50, 50);
@@ -1144,7 +2012,7 @@
             const blinkAlpha = Math.sin(levelCompleteAnimation * 4) * 0.5 + 0.5;
             ctx.fillStyle = `rgba(0, 255, 255, ${blinkAlpha})`;
             ctx.font = '28px Courier New';
-            ctx.fillText('Press SPACE to Continue', canvas.width / 2, canvas.height / 2 + 130);
+            ctx.fillText('Tap to Continue', canvas.width / 2, canvas.height / 2 + 130);
             return;
         }
 
@@ -1184,15 +2052,41 @@
         }
 
         if (gameState === 'paused') {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            // Enhanced pause screen with Star Wars theme
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '48px Courier New';
+            // Pulsing pause text effect
+            const pulseAlpha = Math.sin(Date.now() * 0.003) * 0.3 + 0.7;
+            
+            // Glowing border effect
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(canvas.width / 4, canvas.height / 2 - 80, canvas.width / 2, 160);
+            
+            // Main pause text with glow
+            ctx.shadowColor = '#00ffff';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = `rgba(0, 255, 255, ${pulseAlpha})`;
+            ctx.font = 'bold 48px Courier New';
             ctx.textAlign = 'center';
-            ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+            ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 10);
+            ctx.shadowBlur = 0;
+            
+            // Instructions with device-specific text
+            const isMobile = isMobileDevice() || isTouchDevice();
+            ctx.fillStyle = '#ffffff';
             ctx.font = '24px Courier New';
-            ctx.fillText('Press P to continue', canvas.width / 2, canvas.height / 2 + 50);
+            if (isMobile) {
+                ctx.fillText('Tap ⏸ button to continue', canvas.width / 2, canvas.height / 2 + 40);
+            } else {
+                ctx.fillText('Press P to continue', canvas.width / 2, canvas.height / 2 + 40);
+            }
+            
+            // Additional info
+            ctx.fillStyle = '#888888';
+            ctx.font = '18px Courier New';
+            ctx.fillText('Game and music paused', canvas.width / 2, canvas.height / 2 + 70);
         }
 
         if (gameState === 'gameOver') {
@@ -1221,13 +2115,18 @@
                 ctx.fillText(`Level Reached: ${level}`, canvas.width / 2, canvas.height / 2 + 20);
 
                 const blinkAlpha = Math.sin(gameOverAnimation * 3) * 0.5 + 0.5;
-                ctx.fillStyle = `rgba(0, 255, 0, ${blinkAlpha})`;
-                ctx.font = '28px Courier New';
-                ctx.fillText('Press R to Restart', canvas.width / 2, canvas.height / 2 + 80);
-
-                ctx.fillStyle = '#cccccc';
-                ctx.font = '18px Courier New';
-                ctx.fillText('Press P to Pause during game', canvas.width / 2, canvas.height / 2 + 120);
+                const isMobile = isMobileDevice();
+                const isTouch = isTouchDevice();
+                
+                if (isMobile || isTouch) {
+                    ctx.fillStyle = `rgba(0, 255, 102, ${blinkAlpha})`;
+                    ctx.font = '28px Courier New';
+                    ctx.fillText('Use green RESTART button below', canvas.width / 2, canvas.height / 2 + 80);
+                } else {
+                    ctx.fillStyle = `rgba(0, 255, 0, ${blinkAlpha})`;
+                    ctx.font = '28px Courier New';
+                    ctx.fillText('Press R to Restart', canvas.width / 2, canvas.height / 2 + 80);
+                }
             }
         }
     }
@@ -1290,6 +2189,7 @@
         const nextFormationPattern = (level - 1) % 5 + 1;
         console.log(`LEVEL ${level} INCOMING: ${formationNames[nextFormationPattern - 1]} FORMATION`);
         console.log(`Current invader speed: ${invaderSpeed}`);
+        updateMobileRestartButton(); // Hide restart button when level completes
     }
 
     function gameOver() {
@@ -1303,13 +2203,26 @@
                 ['#ff0000', '#ffff00', '#ff8800'][Math.floor(Math.random() * 3)]
             );
         }
+        updateMobileRestartButton(); // Show restart button when game is over
     }
 
     function init() {
         initializeSpace();
         updateUI();
+        
+        // Initialize adaptive interface (handles device detection, controls, and canvas sizing)
+        initializeAdaptiveInterface();
+        setupTouchControls();
+        
+        // Initialize canvas scale to default values
+        window.canvasScale = { x: 1, y: 1 };
+        
+        // Ensure canvas is properly sized
+        resizeCanvas();
+        
         requestAnimationFrame(gameLoop);
     }
+    
     init();
 </script>
 </body>
